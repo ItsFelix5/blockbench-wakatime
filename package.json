@@ -1,0 +1,19 @@
+{
+    "name": "blockbench-wakatime",
+    "version": "1.0.0",
+    "description": "A plugin to track your Blockbench time using Wakatime.",
+    "main": "index.js",
+    "keywords": [
+        "blockbench",
+        "wakatime",
+        "plugin"
+    ],
+    "author": "ItzShubhamDev",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/itzShubhamDev/blockbench-wakatime"
+    },
+    "devDependencies": {
+        "blockbench-types": "^4.12.2"
+    }
+}
