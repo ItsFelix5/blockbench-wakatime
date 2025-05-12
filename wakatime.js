@@ -146,13 +146,18 @@
             "https://api.wakatime.com/api/v1/users/current/heartbeats";
         const apiKey = settings["api_key"];
 
+        const entity =
+            Project.save_path && Project.save_path.length > 0
+                ? Project.save_path
+                : Project.name;
+
         const args = [
             "--key",
             apiKey,
             "--plugin",
             `Blockbench/${Blockbench.version} BlockbenchWakatime/${version}`,
             "--entity",
-            Project.save_path,
+            entity,
             "--entity-type",
             "app",
             "--project",
