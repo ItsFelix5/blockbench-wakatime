@@ -8,14 +8,16 @@
     let clickListener = null;
     let saveListener = null;
 
+    let projectName;
+
     BBPlugin.register("wakatime", {
         title: "Blockbench Wakatime",
-        author: "ItzShubhamDev",
+        author: "ItsFelix5",
         description: "A plugin to track your Blockbench time using Wakatime.",
         icon: "fas.fa-circle-check",
         version,
         variant: "desktop",
-        repository: "https://github.com/itzshubhamdev/blockbench-wakatime",
+        repository: "https://github.com/ItsFelix5/blockbench-wakatime",
         onload: async function () {
             console.log("Wakatime plugin loaded");
 
@@ -83,6 +85,8 @@
                 wakatimeDiv.style.cursor = "pointer";
             }
 
+            projectName = await getProject();
+
             clickListener = async () => await sendHeartBeat();
             document.addEventListener("click", clickListener);
 
@@ -114,6 +118,26 @@
     });
 
     let lastHeartBeatAt = 0;
+
+    function getProject() {
+        return new Promise(r => {
+            const dialog = new Dialog({
+                id: "project_name",
+                title: "What are you working on?",
+                width: 400,
+                form: {
+                    project_name: {
+                        label: "Project Name",
+                        description: "Enter your project name here.",
+                    },
+                },
+                onConfirm: (res) => {
+                    dialog.close();
+                    r(res["project_name"]);
+                },
+            });
+        });
+    }
 
     function updateStatusBar(text) {
         document.getElementById("wakatime").innerHTML = text;
@@ -161,7 +185,7 @@
             "--entity-type",
             "app",
             "--project",
-            project.getDisplayName(),
+            projectName,
             "--language",
             "BBModel",
         ];
