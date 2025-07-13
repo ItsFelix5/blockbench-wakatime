@@ -8,7 +8,7 @@
     let clickListener = null;
     let saveListener = null;
 
-    let projectName;
+    let projectName = null;
 
     BBPlugin.register("wakatime", {
         title: "Blockbench Wakatime",
@@ -85,8 +85,6 @@
                 wakatimeDiv.style.cursor = "pointer";
             }
 
-            projectName = await getProject();
-
             clickListener = async () => await sendHeartBeat();
             document.addEventListener("click", clickListener);
 
@@ -99,6 +97,7 @@
                     }
                 }
             });
+            getCodingActivity();
         },
         onunload: function () {
             console.log("Wakatime plugin unloaded");
@@ -118,26 +117,6 @@
     });
 
     let lastHeartBeatAt = 0;
-
-    function getProject() {
-        return new Promise(r => {
-            const dialog = new Dialog({
-                id: "project_name",
-                title: "What are you working on?",
-                width: 400,
-                form: {
-                    project_name: {
-                        label: "Project Name",
-                        description: "Enter your project name here.",
-                    },
-                },
-                onConfirm: (res) => {
-                    dialog.close();
-                    r(res["project_name"]);
-                },
-            });
-        });
-    }
 
     function updateStatusBar(text) {
         document.getElementById("wakatime").innerHTML = text;
@@ -227,6 +206,26 @@
     async function getCodingActivity() {
         if (!isCLIInstalled()) return installCLI();
 
+        if (!projectName) await new Promise(r => {
+                const dialog = new Dialog({
+                    id: "project_name",
+                    title: "What are you working on?",
+                    width: 400,
+                    form: {
+                        project_name: {
+                            label: "Project Name",
+                            description: "Enter your project name here.",
+                        },
+                    },
+                    onConfirm: (res) => {
+                        projectName = res["project_name"];
+                        dialog.close();
+                        r();
+                    },
+                });
+                dialog.show();
+            });
+
         const config = fs.readFileSync(getConfigFile()).toString();
         const settings = parseINIString(config)["settings"] || {};
 
@@ -283,7 +282,7 @@
                     }
                     if (json) {
                         if (json.text && json.text.trim().length > 0) {
-                            updateStatusBar(json.text.trim());
+                            updateStatusBar(projectName + ": " + json.text.trim());
                         } else {
                             updateStatusBar("No coding activity found");
                         }
